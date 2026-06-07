@@ -8,46 +8,48 @@ function Category() {
   const [products, setProducts] = useState([]);
   const [sortOrder, setSortOrder] = useState("asc");
 
-  const fetchCategories = async () => {
-    try {
-      const response = await fetch(
-        "https://fakestoreapi.com/products/categories"
-      );
-      const data = await response.json();
-      setCategories(data);
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    }
-  };
-
-  const fetchProducts = async (category = "") => {
-    try {
-      const url = category
-        ? `https://fakestoreapi.com/products/category/${category}`
-        : "https://fakestoreapi.com/products";
-
-      const response = await fetch(url);
-      const data = await response.json();
-
-      // Sort products by price
-      const sortedProducts = [...data].sort((a, b) =>
-        sortOrder === "asc"
-          ? a.price - b.price
-          : b.price - a.price
-      );
-
-      setProducts(sortedProducts);
-    } catch (error) {
-      console.error("Error fetching products:", error);
-    }
-  };
-
+  // Fetch categories once
   useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch(
+          "https://fakestoreapi.com/products/categories"
+        );
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
     fetchCategories();
   }, []);
 
+  // Fetch products when category or sort order changes
   useEffect(() => {
-    fetchProducts(selectedCategory);
+    const fetchProducts = async () => {
+      try {
+        const url = selectedCategory
+          ? `https://fakestoreapi.com/products/category/${selectedCategory}`
+          : "https://fakestoreapi.com/products";
+
+        const response = await fetch(url);
+        const data = await response.json();
+
+        // Sort by price
+        const sortedProducts = [...data].sort((a, b) =>
+          sortOrder === "asc"
+            ? a.price - b.price
+            : b.price - a.price
+        );
+
+        setProducts(sortedProducts);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
+
+    fetchProducts();
   }, [selectedCategory, sortOrder]);
 
   const handleCategoryClick = (category) => {
@@ -77,9 +79,9 @@ function Category() {
               All Products
             </button>
 
-            {categories.map((category, index) => (
+            {categories.map((category) => (
               <button
-                key={index}
+                key={category}
                 onClick={() => handleCategoryClick(category)}
                 className={`w-full text-white font-bold py-2 px-4 rounded ${
                   selectedCategory === category
@@ -92,7 +94,7 @@ function Category() {
             ))}
           </div>
 
-          <h2 className="text-3xl font-bold mb-4 mt-8">Sort By</h2>
+          <h2 className="text-3xl font-bold mt-8 mb-4">Sort By</h2>
 
           <div className="space-y-2">
             <button
@@ -119,7 +121,7 @@ function Category() {
           </div>
         </div>
 
-        {/* Products */}
+        {/* Products Section */}
         <div className="w-full md:w-3/4">
           {selectedCategory ? (
             <h2 className="text-3xl font-bold mb-4">
@@ -137,7 +139,7 @@ function Category() {
                 key={product.id}
                 to={`/single-product/${product.id}`}
               >
-                <div className="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                <div className="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300">
                   <img
                     src={product.image}
                     alt={product.title}
