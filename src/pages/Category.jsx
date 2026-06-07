@@ -11,7 +11,7 @@ function Category() {
   useEffect(() => {
     fetchCategories();
     fetchProducts(); // Fetch all products by default
-  }, ['fetchProducts'fi]);
+  }, [fetchProducts]);
 
   useEffect(() => {
     if (selectedCategory) {
